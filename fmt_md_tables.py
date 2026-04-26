@@ -221,33 +221,49 @@ def format_text(text: str) -> str:
 def main() -> int:
     """CLI entry point.
 
-    Parses arguments and dispatches based on input source:
+    Parses arguments and dispatches based on input source. One or more
+    file paths may be passed; each is processed independently:
 
-    * ``-`` reads from stdin and writes formatted output to stdout.
-    * A path with ``-i`` / ``--in-place`` rewrites the file on disk.
-    * A path without ``-i`` writes formatted output to stdout.
+    * ``-`` reads from stdin (only meaningful as a single argument).
+    * With ``-i`` / ``--in-place``, every path is rewritten on disk.
+    * Without ``-i``, formatted output for every path is written to
+      stdout, concatenated in argument order.
 
     Returns:
-        Process exit code (``0`` on success).
+        Process exit code (``0`` on success, ``1`` if any file fails).
     """
-    ap = argparse.ArgumentParser(description="Format markdown tables in a file.")
-    ap.add_argument("file", help="Markdown file (use - for stdin)")
-    ap.add_argument("-i", "--in-place", action="store_true", help="Write back to file")
+    ap = argparse.ArgumentParser(description="Format markdown tables in files.")
+    ap.add_argument(
+        "files",
+        nargs="+",
+        metavar="FILE",
+        help="Markdown file(s); use - for stdin",
+    )
+    ap.add_argument("-i", "--in-place", action="store_true", help="Write back to each file")
     args = ap.parse_args()
 
-    if args.file == "-":
-        text = sys.stdin.read()
-        sys.stdout.write(format_text(text))
-        return 0
+    rc = 0
+    for f in args.files:
+        try:
+            if f == "-":
+                if args.in_place:
+                    print("fmt-md-tables: -i cannot be used with stdin", file=sys.stderr)
+                    rc = 1
+                    continue
+                sys.stdout.write(format_text(sys.stdin.read()))
+                continue
 
-    path = Path(args.file)
-    text = path.read_text(encoding="utf-8")
-    formatted = format_text(text)
-    if args.in_place:
-        path.write_text(formatted, encoding="utf-8")
-    else:
-        sys.stdout.write(formatted)
-    return 0
+            path = Path(f)
+            text = path.read_text(encoding="utf-8")
+            formatted = format_text(text)
+            if args.in_place:
+                path.write_text(formatted, encoding="utf-8")
+            else:
+                sys.stdout.write(formatted)
+        except OSError as e:
+            print(f"fmt-md-tables: {f}: {e}", file=sys.stderr)
+            rc = 1
+    return rc
 
 
 if __name__ == "__main__":

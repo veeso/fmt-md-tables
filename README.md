@@ -40,9 +40,10 @@ uv tool install fmt-md-tables
 ## Usage
 
 ```sh
-fmt-md-tables FILE          # print formatted output to stdout
-fmt-md-tables -i FILE       # rewrite file in place
-fmt-md-tables -             # read from stdin
+fmt-md-tables FILE                 # print formatted output to stdout
+fmt-md-tables FILE1 FILE2 ...      # process many files (concatenated to stdout)
+fmt-md-tables -i FILE1 FILE2 ...   # rewrite each file in place
+fmt-md-tables -                    # read from stdin
 ```
 
 ## Features
