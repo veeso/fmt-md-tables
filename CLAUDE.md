@@ -13,6 +13,8 @@ dependencies. Distributed on PyPI, installable via `uv tool install`.
 ```
 .
 ├── fmt_md_tables.py        # The whole tool: parsing + formatting + CLI
+├── tests/
+│   └── test_format.py      # pytest suite: unit + CLI tests
 ├── pyproject.toml          # Hatchling build, project metadata, console script
 ├── LICENSE                 # MIT
 ├── README.md               # User-facing docs + badges
@@ -41,6 +43,12 @@ uv pip install -e .               # editable install (needs active venv)
 uv tool install .                 # install CLI globally
 uvx --from . fmt-md-tables FILE   # one-shot run without installing
 python3 fmt_md_tables.py FILE     # run directly without install
+```
+
+Tests:
+
+```sh
+uv run --group dev pytest -q     # full pytest suite
 ```
 
 Smoke test:
@@ -94,9 +102,9 @@ Tag version must match `pyproject.toml` version (minus the `v`).
 ## CI
 
 `ci.yml` runs on push to `main` and PRs. Matrix: ubuntu/macos/windows ×
-Python 3.8–3.13. Steps: install uv, install package, run `--help`, format
-a sample table from stdin. No real test suite yet — adding one is welcome
-but keep it stdlib-only (`unittest` or `pytest` as a dev extra).
+Python 3.8–3.13. Steps: install uv, install package + pytest, run pytest
+suite, then run `--help` and format a sample stdin table as a smoke test.
+Test deps live in the `dev` `[dependency-groups]` group.
 
 ## Things to avoid
 

@@ -24,8 +24,14 @@ fmt-md-tables = "fmt_md_tables:main"
 [project.urls]
 Homepage = "https://github.com/veeso/fmt-md-tables"
 
+[dependency-groups]
+dev = ["pytest>=8"]
+
 [tool.hatch.build.targets.wheel]
 only-include = ["fmt_md_tables.py"]
 
 [tool.hatch.build.targets.sdist]
-include = ["fmt_md_tables.py", "README.md", "pyproject.toml"]
+include = ["fmt_md_tables.py", "README.md", "pyproject.toml", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
